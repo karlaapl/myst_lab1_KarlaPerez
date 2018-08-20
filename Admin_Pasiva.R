@@ -2,7 +2,7 @@
 #ab1
 
 #limpiar el enviroment
-rm(list = ls())
+rm(list <- ls())
 
 # Los  0s aceptados anetes de expresar una cifra en notacion científica
 options("scipen" = 1000,"digits" = 4)
@@ -20,11 +20,11 @@ options(knitr.table.fromat ="html")
 
 Quandl.api_key("xNriyB3ufAxdRmZgpq_p") # cargamos el appi key
 
-Bajarprecios  <- function(Columns, Tickers,Fecha_In,Fecha_Fin) {
+Bajar_precios  <- function(Columns, Tickers,Fecha_In,Fecha_Fin) {
   
   # peticion de descarga de datos
   
-  Datos <- Quandl.datatable(code="WIKI/PRICES",qopts.columns = Columns, ticker = Tickers,date.gte = Fecha_In, date.lte  = Fecha_Fin)
+  Datos <- Quandl.datatable(code="WIKI/PRICES",qopts.columns = Columns, Ticker = Tickers,date.gte = Fecha_In, date.lte  = Fecha_Fin)
 
 
 return(Datos) 
@@ -32,3 +32,22 @@ return(Datos)
 
 tk <-c("TSLA","BBY","HD")
 cs<- c("date", "adj_close")
+ #fechas
+ fs = c("2015-08-01","2016-08-01") # por la c es vector de caracteres 
+
+ 
+ #Capital inicial 
+ 
+ Cap_inicial <- 100000
+ Comision <- .005
+ 
+ Datos <- list()
+ 
+ for (i in 1:length(tk)){
+   Datos[[i]] <- Bajar_precios(Columns = cs, Ticker = tk[i], Fecha_In = fs[1],Fecha_Fin = fs[2]) 
+   
+  
+ }
+ 
+ #names(Datos)<-tk
+ 
