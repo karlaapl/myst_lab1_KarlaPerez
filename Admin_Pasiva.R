@@ -21,10 +21,14 @@ options(knitr.table.fromat ="html")
 Quandl.api_key("xNriyB3ufAxdRmZgpq_p") # cargamos el appi key
 
 Bajar_precios  <- function(Columns, Tickers,Fecha_In,Fecha_Fin) {
+  Columns<-cs 
+  Tickers<-tk[1]
+  Fecha_In <- fs[1]
+  Fecha_Fn<-fs[2]
   
   # peticion de descarga de datos
   
-  Datos <- Quandl.datatable(code="WIKI/PRICES",qopts.columns = Columns, Ticker = Tickers,date.gte = Fecha_In, date.lte  = Fecha_Fin)
+  Datos <- Quandl.datatable("WIKI/PRICES",qopts.columns = Columns, Ticker = Tickers,date.gte = Fecha_In, date.lte  = Fecha_Fin)
 
 
 return(Datos) 
