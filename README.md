@@ -1,4 +1,5 @@
 # myst_lab1_KarlaPerez
+ El primer laboratorio trata  hasta ahora de descargar precios de 3 acciones y  se obtiene un xts para que los rendimientos queden indexados con sus fechas.
  
  ## Paquetería necesaria en RStudio ...
 
