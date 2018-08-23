@@ -2,7 +2,7 @@
 #ab1
 
 #limpiar el enviroment
-rm(list <- ls())
+rm(list = ls())
 
 # Los  0s aceptados anetes de expresar una cifra en notacion científica
 options("scipen" = 1000,"digits" = 4)
@@ -53,5 +53,12 @@ cs<- c("date", "adj_close")
   
  }
  
- #names(Datos)<-tk
+ names(Datos)<-tk
+ 
+ for(i in 1:length(tk))
+   Datos[[i]]$adj_close_r <- c(0, diff(log(Datos[[i]]$adj_close)))
+ 
+ Rends <- xts(x = cbind(Datos[[1]]$adj_close_r, Datos[[2]]$adj_close_r, Datos[[3]]$adj_close_r),
+              order.by = Datos[[1]]$date)[-1]
+ names(Rends) <- tk
  
