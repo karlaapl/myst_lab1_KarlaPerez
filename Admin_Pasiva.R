@@ -4,7 +4,7 @@
 #limpiar el enviroment
 rm(list = ls())
 
-# Los  0s aceptados anetes de expresar una cifra en notacion científica
+# Los  0s aceptados anetes de expresar una cifra en notacion cientÃ­fica
 options("scipen" = 1000,"digits" = 4)
 
 # Librerias a utilizar
@@ -13,7 +13,7 @@ suppressMessages(library(plotly))
 suppressMessages(library(Quandl)) #descarga de precios
 
 suppressMessages(library(PortfolioAnalytics)) #Teoria modenar de portafolio 
-suppressMessages(library(ROI)) #optimización para ele portafolio 
+suppressMessages(library(ROI)) #optimizaciÃ³n para ele portafolio 
 suppressMessages(library(knitr))
 suppressMessages(library(kableExtra)) #tablas en html 
 options(knitr.table.fromat ="html")
@@ -61,4 +61,11 @@ cs<- c("date", "adj_close")
  Rends <- xts(x = cbind(Datos[[1]]$adj_close_r, Datos[[2]]$adj_close_r, Datos[[3]]$adj_close_r),
               order.by = Datos[[1]]$date)[-1]
  names(Rends) <- tk
+ 
+ Port1 <-portfolio.spec(assets = tk)
+ ## Agregando restricciones
+ Port1 <-  add.constraint(portfolio = Port1, type = "full_investment")
+ Port1 <-  add.constraint(portfolio = Port1, type = "box",min = c(.01,.01,.01),max = c(.7,.7,.7)) #diversificar
+ Port1 <-  add.objective(portfolio = Port1,type = "return",name = "mean")
+ Port1 <- optimize.portfolio(R = Rends, portfolio = Port1, optimize_method = "random", trace = TRUE, search_size = 5000)
  
