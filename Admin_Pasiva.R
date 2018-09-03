@@ -68,4 +68,13 @@ cs<- c("date", "adj_close")
  Port1 <-  add.constraint(portfolio = Port1, type = "box",min = c(.01,.01,.01),max = c(.7,.7,.7)) #diversificar
  Port1 <-  add.objective(portfolio = Port1,type = "return",name = "mean")
  Port1 <- optimize.portfolio(R = Rends, portfolio = Port1, optimize_method = "random", trace = TRUE, search_size = 5000)
+ Portfolios <-vector("list",length = length(Port1$random_portfolio_objective_results))
+ 
+  for (i in 1:length(Port1$random_portfolio_objective_results)){
+   Portfolios[[i]]$Pesos<- Port1$random_portfolio_objective_results[[i]]$weights #para indexar listas se utliza [[]], ese elemento del portafolio se va creando desde el for
+   Portfolios[[i]]$Medias<- Port1$random_portfolio_objective_results[[i]]$objective_measures$mean
+   Portfolios[[i]]$Vars<-var.portfolio(R = Port1$R,weights = Portfolios[[i]]$Pesos)
+   names(Portfolios[[i]]$Medias)<- NULL
+ 
+  }
  
