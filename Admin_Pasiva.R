@@ -77,4 +77,10 @@ cs<- c("date", "adj_close")
    names(Portfolios[[i]]$Medias)<- NULL
  
   }
+  # creamos un dataframe para poder almacenar todo tipo de valores 
+ df_Portfolio <- data.frame(matrix(nrow = length(Port1$random_portfolio_objective_results),ncol =3,data = 0))
  
+ colnames(df_Portfolio)<- c("Rend","Var","Clase")
+
+   
+   
