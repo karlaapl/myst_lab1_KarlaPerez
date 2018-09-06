@@ -11,7 +11,11 @@ options("scipen"=100, "digits"=4)
 suppressMessages(library(plotly)) # 
 suppressMessages(library(Quandl)) # Descarga de Precios
 suppressMessages(library(PortfolioAnalytics)) ##Teoria modenar de portafolio
+<<<<<<< HEAD
 suppressMessages(library(ROI)) # optimización para ele portafolio 
+=======
+suppressMessages(library(ROI)) # optimizaciÃ³n para ele portafolio 
+>>>>>>> 7b61a41e9a8bc311737e9f4bacf98fe2e7fb6ee9
 
 suppressMessages(library(knitr))  
 suppressMessages(library(kableExtra)) # Tablas en HTML
@@ -30,8 +34,12 @@ Bajar_Precios <- function(Columns, Tickers, Fecha_In, Fecha_Fn) {
 }
 
 # Tickers de accciones y datos a solicitar a QUANDL
+<<<<<<< HEAD
 #- c("TSLA", "BBY", "HD")
 tk <- c("AAPL", "GOOGL", "NKE")
+=======
+tk <- c("TSLA", "BBY", "HD")
+>>>>>>> 7b61a41e9a8bc311737e9f4bacf98fe2e7fb6ee9
 cs <- c("date", "adj_close")
 Capital_Inicial <- 10000
 fs = c("2015-08-01","2016-08-01") # por la c es vector de caracteres 
@@ -46,6 +54,7 @@ names(Datos) <- tk
 
 for(i in 1:length(tk))
   Datos[[i]]$adj_close_r <- c(0, diff(log(Datos[[i]]$adj_close)))
+<<<<<<< HEAD
 
 Rends <- xts(x = cbind(Datos[[1]]$adj_close_r, Datos[[2]]$adj_close_r, Datos[[3]]$adj_close_r),
              order.by = Datos[[1]]$date)[-1]
@@ -59,6 +68,21 @@ Port1 <- add.objective(portfolio = Port1, type = "return", name = "mean")
 Port1 <- optimize.portfolio(R=Rends, portfolio = Port1, optimize_method = "random", trace = TRUE, search_size =5000)
 Portafolios <- vector("list", length = length(Port1$random_portfolio_objective_results))
 
+=======
+
+Rends <- xts(x = cbind(Datos[[1]]$adj_close_r, Datos[[2]]$adj_close_r, Datos[[3]]$adj_close_r),
+             order.by = Datos[[1]]$date)[-1]
+names(Rends) <- tk
+Port1 <- portfolio.spec(assets=tk)
+# Agregando restricciones
+
+Port1 <- add.constraint(portfolio=Port1, type="full_investment")
+Port1 <- add.constraint(portfolio=Port1, type="box", min=c(0.01, 0.01, 0.01), max=c(0.7, 0.7, 0.7))
+Port1 <- add.objective(portfolio = Port1, type = "return", name = "mean")
+Port1 <- optimize.portfolio(R=Rends, portfolio = Port1, optimize_method = "random", trace = TRUE, search_size =5000)
+Portafolios <- vector("list", length = length(Port1$random_portfolio_objective_results))
+
+>>>>>>> 7b61a41e9a8bc311737e9f4bacf98fe2e7fb6ee9
 for (i in 1:length(Port1$random_portfolio_objective_results)){
   Portafolios[[i]]$Pesos <- Port1$random_portfolio_objective_results[[i]]$weights #para indexar listas se utliza [[]], ese elemento del portafolio se va creando desde el for
   Portafolios[[i]]$Medias <- Port1$random_portfolio_objective_results[[i]]$objective_measures$mean
@@ -78,6 +102,7 @@ for (i in 1:length(Port1$random_portfolio_objective_results)){
       df_Portafolios[i,paste("Titulos_ini_", tk[k], sep="")] <-
       (Capital_Inicial*Portafolios[[i]]$Pesos[k])%/%Datos[[k]]$adj_close[1]
   }
+<<<<<<< HEAD
   }
   
   # grafica en el eje x la varianza, y, rend
@@ -153,3 +178,7 @@ for (i in 1:length(Port1$random_portfolio_objective_results)){
            yaxis = list(title = "Balance"), 
            legend = list(orientation = 'h', y = -0.25, x = 0.5)) 
   
+=======
+}
+   
+>>>>>>> 7b61a41e9a8bc311737e9f4bacf98fe2e7fb6ee9
