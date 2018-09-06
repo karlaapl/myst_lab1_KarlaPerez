@@ -30,7 +30,8 @@ Bajar_Precios <- function(Columns, Tickers, Fecha_In, Fecha_Fn) {
 }
 
 # Tickers de accciones y datos a solicitar a QUANDL
-tk <- c("TSLA", "BBY", "HD")
+#- c("TSLA", "BBY", "HD")
+tk <- c("AAPL", "GOOGL", "NKE")
 cs <- c("date", "adj_close")
 Capital_Inicial <- 10000
 fs = c("2015-08-01","2016-08-01") # por la c es vector de caracteres 
@@ -77,4 +78,78 @@ for (i in 1:length(Port1$random_portfolio_objective_results)){
       df_Portafolios[i,paste("Titulos_ini_", tk[k], sep="")] <-
       (Capital_Inicial*Portafolios[[i]]$Pesos[k])%/%Datos[[k]]$adj_close[1]
   }
-}
+  }
+  
+  # grafica en el eje x la varianza, y, rend
+  Plot_portafolios <- plot_ly(x=df_Portafolios$Var, y=df_Portafolios$Rend, type='scatter', mode='markers',
+                              name = "Portafolios", marker = list(color="grey", size=7), hoverinfo='text', 
+                              text = ~paste('Rendimiento: ', paste(df_Portafolios$Rend*100, "%") ,
+                                            '<br> Riesgo: ', paste(df_Portafolios$Var*100, "%") )) %>% 
+    layout(title = "Portafolios (Markowitz)",
+           xaxis = list(title = "Riesgo (Desviaci?n Est?ndar Anualizada)",
+                        showgrid = F),
+           yaxis = list(title = "Valor Esperado (Rendimiento Anualizado)"),
+           legend = list(orientation = 'h', y = -0.25))
+  Plot_portafolios # hasta aqui se grafica
+  
+  # Se seleccionan los mejores portafolios que cumplan  con los diferentes requerimientos < var, > rendm y  >ratio Sharpe
+  Port_1 <- df_Portafolios[which.max(df_Portafolios$Rend),]
+  # Portafolio con m?nima varianza
+  Port_2 <- df_Portafolios[which.min(df_Portafolios$Var),]
+  # Tasa libre de riesgo
+  rf <- 0.0272
+  # Rendimiento de portafolio
+  rp <- df_Portafolios$Rend
+  # Varianza de portafolio
+  sp <- df_Portafolios$Var
+  # Indice de sharpe
+  sharpe <- (rp-rf)/sp
+  # Portafolio con m?ximo Sharpe ratio 
+  Port_3 <- df_Portafolios[which.max(sharpe),]
+  Ports <- cbind(rbind(Port_1, Port_2, Port_3),
+                 "Portafolio" = c("Maximo Rendimiento","Minima Varianza","Maximo Sharpe Ratio"))
+  Plot_portafolios <- plot_ly(x=df_Portafolios$Var, y=df_Portafolios$Rend, type='scatter', mode='markers',
+                              name = "Portafolios", marker = list(color="grey", size=7), hoverinfo='text', 
+                              text = ~paste('Rendimiento: ', paste(df_Portafolios$Rend*100, "%") ,
+                                            '<br> Riesgo: ', paste(df_Portafolios$Var*100, "%") )) %>% 
+    layout(title = "Portafolios (Markowitz)",
+           xaxis = list(title = "Riesgo (Desviaci?n Est?ndar Anualizada)",
+                        showgrid = F),
+           yaxis = list(title = "Valor Esperado (Rendimiento Anualizado)"),
+           legend = list(orientation = 'h', y = -0.25)) %>%
+    add_trace(x = ~Ports$Var[1], y = ~Ports$Rend[1], name = Ports$Portafolio[1],
+              mode = 'marker', marker = list(color="green", size=10)) %>%
+    add_trace(x = ~Ports$Var[2], y = ~Ports$Rend[2], name = Ports$Portafolio[2],
+              mode = 'marker', marker = list(color="blue", size=10)) %>%
+    add_trace(x = ~Ports$Var[3], y = ~Ports$Rend[3], name = Ports$Portafolio[3],
+              mode = 'marker', marker = list(color="orange", size=10))
+  Plot_portafolios
+  # Pesos y titulos iniciales, de todos los activos, para los 3 portafolios
+  Pesos_Titulos <- Ports[,-c(1,2,3)]
+  # Encontrar las columnas cuyo nombre contenga "Titulos_ini", con esas encontraremos m?s f?cil los t?tulos
+  # por portafolio por activo
+  Ind <- grep(pattern = "Titulos_ini",x = colnames(Pesos_Titulos)) # la función de grep es buscar matches de argumentos 
+  Historicos_Ports <- data.frame("Date" = Datos[[1]]$date)
+  # Crear data frame que contendr? los datos finales de cada estrategia
+  for(i in 1:length(Ports[,1])) {
+    Historicos_Ports[[paste("Portafolio_",i,sep="")]] <- 
+      (Datos[[1]]$adj_close*Pesos_Titulos[i,Ind[1]]  + 
+         Datos[[2]]$adj_close*Pesos_Titulos[i,Ind[2]] +
+         Datos[[3]]$adj_close*Pesos_Titulos[i,Ind[3]])
+  }
+  
+  
+  #####  Se utiliza esta parte más bien para series de tiempo
+  
+  plot_ly(Historicos_Ports) %>%
+    add_trace(x = ~Date, y = ~round(Portafolio_1,2), type = 'scatter', mode = 'lines', name = 'M?ximo Rendimiento',
+              line = list(color = 'red'), hoverinfo = "text", text = ~paste('Port_1',round(Portafolio_1,2))) %>%
+    add_trace(x = ~Date, y = ~round(Portafolio_2,2), type = 'scatter', mode = 'lines', name = 'M?nima Varianza',
+              line = list(color = 'blue'), hoverinfo = "text", text = ~paste('Port_2',round(Portafolio_2,2)))  %>%
+    add_trace(x = ~Date, y = ~round(Portafolio_3,2), type = 'scatter', mode = 'lines', name = 'M?ximo Sharpe Ratio',
+              line = list(color = 'green'), hoverinfo = "text", text = ~paste('Port_3',round(Portafolio_3,2)))%>% 
+    layout(title = "3 Portafolios distintos objetivos",
+           xaxis = list(title = "Fechas", showgrid = T),
+           yaxis = list(title = "Balance"), 
+           legend = list(orientation = 'h', y = -0.25, x = 0.5)) 
+  
